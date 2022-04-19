@@ -5,54 +5,57 @@
   import "@openzeppelin/contracts/access/Ownable.sol";
   import "./IntWhitelist.sol";
 
-/**
-* @dev _baseTokenURI for computing {tokenURI}. If set, the resulting URI for each
-* token will be the concatenation of the `baseURI` and the `tokenId`.
-*/
-  string _baseTokenURI; 
+ contract CryptoDevs is ERC721Enumerable, Ownable {
+      /**
+       * @dev _baseTokenURI for computing {tokenURI}. If set, the resulting URI for each
+       * token will be the concatenation of the `baseURI` and the `tokenId`.
+       */
+      string _baseTokenURI;
 
-//   Whitelist contract instance
-  IntWhitelist whitelist;
+      //  _price is the price of one Crypto Dev NFT
+      uint256 public _price = 0.01 ether;
 
- // boolean to keep track of whether presale started or not
-      bool public presaleStarted;
+      // _paused is used to pause the contract in case of an emergency
+      bool public _paused;
 
-// timestamp for when presale would end
-      uint256 public presaleEnded;
-
-//  max number of CryptoDevs
+      // max number of CryptoDevs
       uint256 public maxTokenIds = 20;
 
-//   total number of tokenIds minted
+      // total number of tokenIds minted
       uint256 public tokenIds;
 
-// price of an Nft
-  uint256 public _price = 0.1 ether;
+      // Whitelist contract instance
+      IntWhitelist whitelist;
 
- // _paused is used to pause the contract in case of an emergency
-  bool  public _paused
+      // boolean to keep track of whether presale started or not
+      bool public presaleStarted;
 
+      // timestamp for when presale would end
+      uint256 public presaleEnded;
 
   modifier onlyWhenNotPaused() {
       require(!_paused, 'Contract currently paused');
-      _
+      _;
   }
-
-  contract CryptoDevs is ERC721Enumerable, Ownable{
-      constructor(string memory baseURI, address whitelistContract ) ERC721('Crypto Devs', 'CD'){
-
-    _baseTokenURI = baseURI;
-    whitelist = IntWhitelist(whitelistContract)
+    /**
+       * @dev ERC721 constructor takes in a `name` and a `symbol` to the token collection.
+       * name in our case is `Crypto Devs` and symbol is `CD`.
+       * Constructor for Crypto Devs takes in the baseURI to set _baseTokenURI for the collection.
+       * It also initializes an instance of whitelist interface.
+       */
+      constructor (string memory baseURI, address whitelistContract) ERC721("Crypto Devs", "CD") {
+          _baseTokenURI = baseURI;
+          whitelist = IntWhitelist(whitelistContract);
       }
 
  /**
     * @dev startPresale starts a presale for the whitelisted addresses
  */
       function startPresale() public onlyOwner {
-          _presaleStarted = true;
+          presaleStarted = true;
           // Set presaleEnded time as current timestamp + 5 minutes
           // Solidity has cool syntax for timestamps (seconds, minutes, hours, days, years)
-          _presaleEnded = block.timestamp + 5 minutes;
+          presaleEnded = block.timestamp + 5 minutes;
       }
 
 
@@ -60,7 +63,7 @@
        * @dev presaleMint allows a user to mint one NFT per transaction during the presale.
        */
       function presaleMint() public payable onlyWhenNotPaused {
-          require(_presaleStarted && block.timestamp < _presaleEnded, "Presale is not running");
+          require(presaleStarted && block.timestamp < presaleEnded, "Presale is not running");
           require(whitelist.whitelistedAddresses(msg.sender), "You are not whitelisted");
           require(tokenIds < maxTokenIds, "Exceeded maximum Crypto Devs supply");
           require(msg.value >= _price, "Ether sent is not correct");
@@ -72,8 +75,8 @@
       }
 
       function mint() public payable {
-          require(presaleStarted && block.timestamp >= presaleEnded)
-             require(tokenId < maxTokenIds, 'Exceeded the limit');
+          require(presaleStarted && block.timestamp >= presaleEnded);
+             require(tokenIds < maxTokenIds, 'Exceeded the limit');
           require(msg.value >= _price, 'Ether sent is not correct');
       }
 
@@ -99,6 +102,6 @@
           _paused = val;
       }
       
-      receive() external payable()
-      fallback()  external payable()
+      receive() external payable {}
+      fallback()  external payable{}
   }  
