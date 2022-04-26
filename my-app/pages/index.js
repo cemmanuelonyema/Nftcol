@@ -132,10 +132,10 @@ export default function Home() {
       // call the presaleEnded from the contract, it's going to return a bigNum
       const presaleEndTime = await nftContract.presaleEnded();
       // Date.now()/1000 returns the current time in seconds
-      //   const currentTimeInSeconds = Math.floor(Date.now() / 1000);
+      const currentTimeInSeconds = Date.now() / 1000;
       // We compare if the presaleEndTime timestamp is less than the current time lt
       // (less than function) used on bigNum.
-      const hasPresaleEnded = presaleEndTime.lt(Math.floor(Date.now() / 1000));
+      const hasPresaleEnded = presaleEnded.lt(Math.floor(currentTimeInSeconds));
 
       setPresaleEnded(hasPresaleEnded);
       return hasPresaleEnded;
