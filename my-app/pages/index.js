@@ -3,7 +3,6 @@ import { Contract, providers, utils } from "ethers";
 import React, { useEffect, useRef, useState } from "react";
 import Web3Modal from "web3modal";
 import Image from "next/image";
-
 import { abi, NFT_CONTRACT_ADDRESS } from "../constant";
 import styles from "../styles/Home.module.css";
 
@@ -165,6 +164,7 @@ export default function Home() {
       console.error(err);
     }
   };
+
   const getProviderOrSigner = async (needSigner = false) => {
     try {
       //connect to MetaMask
@@ -200,6 +200,7 @@ export default function Home() {
   };
 
   const onPageLoad = async () => {
+    await connectWallet();
     await getOwner();
     const presaleStarted = await checkIfPresaleStarted();
 
@@ -238,16 +239,8 @@ export default function Home() {
   });
 
   const renderButton = () => {
-    if (!walletConnected) {
-      return (
-        <button onClick={connectWallet} className={styles.button}>
-          Connect your wallet
-        </button>
-      );
-    }
-
     if (loading) {
-      return <button className={styles.button}>Loading...</button>;
+      return <button className={styles.button}>Loading.......</button>;
     }
 
     if (isOwner && !presaleStarted) {
